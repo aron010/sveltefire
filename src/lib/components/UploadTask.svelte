@@ -9,9 +9,19 @@
     UploadTaskSnapshot,
   } from "firebase/storage";
 
-  export let ref: string | StorageReference;
-  export let data: Blob | Uint8Array | ArrayBuffer;
-  export let metadata: UploadMetadata | undefined = undefined;
+  interface Props {
+    ref: string | StorageReference;
+    data: Blob | Uint8Array | ArrayBuffer;
+    metadata?: UploadMetadata | undefined;
+    children?: import('svelte').Snippet<[any]>;
+  }
+
+  let {
+    ref,
+    data,
+    metadata = undefined,
+    children
+  }: Props = $props();
 
   const { storage } = getFirebaseContext();
   const upload = uploadTaskStore(storage!, ref, data, metadata);
@@ -26,9 +36,9 @@
     };
   }
 
-  $: progress = ($upload?.bytesTransferred! / $upload?.totalBytes!) * 100 ?? 0;
+  let progress = $derived(($upload?.bytesTransferred! / $upload?.totalBytes!) * 100 ?? 0);
 </script>
 
 {#if $upload !== undefined}
-  <slot task={$upload?.task} snapshot={$upload} {progress} ref={upload.reference} {storage} />
+  {@render children?.({ task: $upload?.task, snapshot: $upload, progress, ref: upload.reference, storage, })}
 {/if}

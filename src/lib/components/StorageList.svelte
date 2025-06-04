@@ -3,7 +3,13 @@
     import { getFirebaseContext } from '$lib/stores/sdk.js';
     import type { FirebaseStorage, ListResult, StorageReference } from 'firebase/storage';
 
-    export let ref: string | StorageReference;
+    interface Props {
+        ref: string | StorageReference;
+        children?: import('svelte').Snippet<[any]>;
+        loading?: import('svelte').Snippet;
+    }
+
+    let { ref, children, loading }: Props = $props();
 
     const { storage } = getFirebaseContext();
     const listStore = storageListStore(storage!, ref);
@@ -15,8 +21,8 @@
 </script>
 
 {#if $listStore !== undefined}
-    <slot list={$listStore} ref={listStore.reference} {storage} />
+    {@render children?.({ list: $listStore, ref: listStore.reference, storage, })}
 {:else}
-    <slot name="loading" />
+    {@render loading?.()}
 {/if}
 

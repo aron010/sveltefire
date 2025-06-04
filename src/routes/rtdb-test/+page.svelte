@@ -22,36 +22,46 @@
 
 <h2>Single Data Reference</h2>
 
-<Node path="posts/test" let:data={post}>
-  <p data-testid="node-data">{post?.title}</p>
-  <div slot="loading">
-    <p data-testid="loading">Loading...</p>
-  </div>
+<Node path="posts/test" >
+  {#snippet children({ data: post })}
+    <p data-testid="node-data">{post?.title}</p>
+    {/snippet}
+  {#snippet loading()}
+    <div >
+      <p data-testid="loading">Loading...</p>
+    </div>
+  {/snippet}
 </Node>
 
 <h2>User Owned Data</h2>
 
-<SignedOut let:auth>
-  <h2>Signed Out</h2>
-  <button on:click={() => signInAnonymously(auth)}>Sign In</button>
+<SignedOut >
+  {#snippet children({ auth })}
+    <h2>Signed Out</h2>
+    <button onclick={() => signInAnonymously(auth)}>Sign In</button>
+  {/snippet}
 </SignedOut>
 
-<SignedIn let:user>
-  <h2>Data List</h2>
-  <NodeList
-    path={`users/${user.uid}/posts`}
-    startWith={[]}
-    let:data={posts}
-    let:count
-  >
-    <p data-testid="count">You've made {count} posts</p>
+<SignedIn >
+  {#snippet children({ user })}
+    <h2>Data List</h2>
+    <NodeList
+      path={`users/${user.uid}/posts`}
+      startWith={[]}
+      
+      
+    >
+      {#snippet children({ data: posts, count })}
+        <p data-testid="count">You've made {count} posts</p>
 
-    <ul>
-      {#each posts as post (post.nodeKey)}
-        <li>{post?.content} ... {post.nodeKey}</li>
-      {/each}
-    </ul>
+        <ul>
+          {#each posts as post (post.nodeKey)}
+            <li>{post?.content} ... {post.nodeKey}</li>
+          {/each}
+        </ul>
 
-    <button on:click={() => addPost(user.uid)}>Add Post</button>
-  </NodeList>
+        <button onclick={() => addPost(user.uid)}>Add Post</button>
+            {/snippet}
+    </NodeList>
+  {/snippet}
 </SignedIn>

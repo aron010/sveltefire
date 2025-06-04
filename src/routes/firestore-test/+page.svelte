@@ -22,51 +22,61 @@
     });
   }
 
-  $: makeQuery = (uid: string) => {
+  let makeQuery = $derived((uid: string) => {
     const q = query(
       collection(firestore, `users/${uid}/posts`),
       orderBy("created")
     );
     return q;
-  };
+  });
 </script>
 
 <h1>Firestore Test</h1>
 
 <h2>Single Document</h2>
 
-<Doc ref="posts/test" let:data={post}>
-  <p data-testid="doc-data">{post?.title}</p>
-  <div slot="loading">
-    <p data-testid="loading">Loading...</p>
-  </div>
+<Doc ref="posts/test" >
+  {#snippet children({ data: post })}
+    <p data-testid="doc-data">{post?.title}</p>
+    {/snippet}
+  {#snippet loading()}
+    <div >
+      <p data-testid="loading">Loading...</p>
+    </div>
+  {/snippet}
 </Doc>
 
 <h2>User Owned Posts</h2>
 
-<SignedOut let:auth>
+<SignedOut >
+    {#snippet children({ auth })}
     <h2>Signed Out</h2>
-   <button on:click={() => signInAnonymously(auth)}>Sign In</button>
+     <button onclick={() => signInAnonymously(auth)}>Sign In</button>
+  {/snippet}
 </SignedOut>
 
 
 
-<SignedIn let:user>
-  <h2>Collection</h2>
-  <Collection
-    ref={makeQuery(user.uid)}
-    startWith={[]}
-    let:data={posts}
-    let:count
-  >
-    <p data-testid="count">You've made {count} posts</p>
+<SignedIn >
+  {#snippet children({ user })}
+    <h2>Collection</h2>
+    <Collection
+      ref={makeQuery(user.uid)}
+      startWith={[]}
+      
+      
+    >
+      {#snippet children({ data: posts, count })}
+        <p data-testid="count">You've made {count} posts</p>
 
-    <ul>
-      {#each posts as post (post.id)}
-        <li>{post?.content} ... {post.id}</li>
-      {/each}
-    </ul>
+        <ul>
+          {#each posts as post (post.id)}
+            <li>{post?.content} ... {post.id}</li>
+          {/each}
+        </ul>
 
-    <button on:click={() => addPost(user.uid)}>Add Post</button>
-  </Collection>
+        <button onclick={() => addPost(user.uid)}>Add Post</button>
+            {/snippet}
+    </Collection>
+  {/snippet}
 </SignedIn>

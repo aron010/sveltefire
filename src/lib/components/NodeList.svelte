@@ -3,8 +3,19 @@
   import { getFirebaseContext } from "../stores/sdk.js";
   import type { DatabaseReference, Database } from "firebase/database";
 
-  export let path: string;
-  export let startWith: any[] = [];
+  interface Props {
+    path: string;
+    startWith?: any[];
+    children?: import('svelte').Snippet<[any]>;
+    loading?: import('svelte').Snippet;
+  }
+
+  let {
+    path,
+    startWith = [],
+    children,
+    loading
+  }: Props = $props();
 
   const { rtdb } = getFirebaseContext();
   let store = nodeListStore(rtdb!, path, startWith);
@@ -21,7 +32,7 @@
 </script>
 
 {#if $store !== undefined}
-  <slot data={$store} ref={store.ref} count={$store?.length ?? 0} {rtdb} />
+  {@render children?.({ data: $store, ref: store.ref, count: $store?.length ?? 0, rtdb, })}
 {:else}
-  <slot name="loading" />
+  {@render loading?.()}
 {/if}

@@ -3,9 +3,13 @@
   import { getFirebaseContext } from "$lib/index.js";
   import { onMount } from "svelte";
 
-  export let eventName = "page_view";
-  export let setUser = true;
-  export let customParams: Record<string, unknown> = {};
+  interface Props {
+    eventName?: string;
+    setUser?: boolean;
+    customParams?: Record<string, unknown>;
+  }
+
+  let { eventName = "page_view", setUser = true, customParams = {} }: Props = $props();
 
   const analytics = getFirebaseContext().analytics!;
   const auth = getFirebaseContext().auth!;

@@ -7,8 +7,19 @@
   import { docStore } from "../stores/firestore.js";
   import { getFirebaseContext } from "../stores/sdk.js";
 
-  export let ref: string | DocumentReference<Data>;
-  export let startWith: Data | undefined = undefined;
+  interface Props {
+    ref: string | DocumentReference<Data>;
+    startWith?: Data | undefined;
+    children?: import('svelte').Snippet<[any]>;
+    loading?: import('svelte').Snippet;
+  }
+
+  let {
+    ref,
+    startWith = undefined,
+    children,
+    loading
+  }: Props = $props();
 
   const { firestore } = getFirebaseContext();
 
@@ -25,7 +36,7 @@
 </script>
 
 {#if $store !== undefined && $store !== null}
-  <slot data={$store} ref={store.ref} {firestore} />
+  {@render children?.({ data: $store, ref: store.ref, firestore, })}
 {:else}
-  <slot name="loading" />
+  {@render loading?.()}
 {/if}

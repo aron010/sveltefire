@@ -2,6 +2,12 @@
   import type { User } from "firebase/auth";
   import { userStore } from "$lib/stores/auth.js";
   import { getFirebaseContext } from "$lib/index.js";
+  interface Props {
+    children?: import('svelte').Snippet<[any]>;
+    signedOut?: import('svelte').Snippet;
+  }
+
+  let { children, signedOut }: Props = $props();
 
   const auth = getFirebaseContext().auth!;
   const user = userStore(auth)
@@ -13,7 +19,7 @@
 </script>
 
 {#if $user}
-  <slot user={$user} />
+  {@render children?.({ user: $user, })}
 {:else}
-  <slot name="signedOut" />
+  {@render signedOut?.()}
 {/if}

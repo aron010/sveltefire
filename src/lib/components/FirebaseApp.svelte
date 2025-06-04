@@ -6,13 +6,25 @@
   import type { FirebaseStorage } from "firebase/storage";
   import type { Analytics } from "firebase/analytics";
 
-  export let firestore: Firestore | undefined = undefined;
-  export let rtdb: Database | undefined = undefined;
-  export let auth: Auth | undefined = undefined;
-  export let storage: FirebaseStorage | undefined = undefined;
-  export let analytics: Analytics | undefined = undefined;
+  interface Props {
+    firestore?: Firestore | undefined;
+    rtdb?: Database | undefined;
+    auth?: Auth | undefined;
+    storage?: FirebaseStorage | undefined;
+    analytics?: Analytics | undefined;
+    children?: import('svelte').Snippet;
+  }
+
+  let {
+    firestore = undefined,
+    rtdb = undefined,
+    auth = undefined,
+    storage = undefined,
+    analytics = undefined,
+    children
+  }: Props = $props();
 
   setFirebaseContext({ firestore, rtdb, auth, storage, analytics });
 </script>
 
-<slot />
+{@render children?.()}

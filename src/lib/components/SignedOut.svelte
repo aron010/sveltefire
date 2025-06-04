@@ -2,6 +2,11 @@
     import { getFirebaseContext } from "../stores/sdk.js";
     import { userStore } from "../stores/auth.js";
     import type { Auth } from 'firebase/auth';
+  interface Props {
+    children?: import('svelte').Snippet<[any]>;
+  }
+
+  let { children }: Props = $props();
 
     const auth = getFirebaseContext().auth!;
     const user = userStore(auth)
@@ -13,5 +18,5 @@
   </script>
   
   {#if !$user}
-    <slot {auth} />
+    {@render children?.({ auth, })}
   {/if}

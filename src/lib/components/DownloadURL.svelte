@@ -3,7 +3,13 @@
     import { getFirebaseContext } from '$lib/stores/sdk.js';
     import type { FirebaseStorage, StorageReference } from 'firebase/storage';
 
-    export let ref: string | StorageReference;
+    interface Props {
+        ref: string | StorageReference;
+        children?: import('svelte').Snippet<[any]>;
+        loading?: import('svelte').Snippet;
+    }
+
+    let { ref, children, loading }: Props = $props();
 
     const { storage } = getFirebaseContext();
     const store = downloadUrlStore(storage!, ref);
@@ -15,8 +21,8 @@
 </script>
 
 {#if $store !== undefined}
-    <slot link={$store} ref={store.reference} {storage}/>
+    {@render children?.({ link: $store, ref: store.reference, storage, })}
 {:else}
-    <slot name="loading" />
+    {@render loading?.()}
 {/if}
 
